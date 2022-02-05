@@ -1,0 +1,9 @@
+@relation tissue-paper
+
+@attribute acid_durability numeric
+@attribute strength numeric
+@attribute classification {BAD,GOOD}
+
+@data
+4,6,GOOD
+
