@@ -7,14 +7,17 @@ struct treeAttributes{
   char gender;
   float height;
   char heightRange;
-  char output
+  char output;
 } attribute[15];
 
 int n=15;
-char name={"Kristina","Jim","Maggie","Martha","Stephanie","Bob","Kathy","Dave","Worth","Steven","Debbie","Todd", "Kim","Amy","Wynette"};
-char gender={"f","m","f","f","f","m","f","m","m","m","f","m","f","f","f"};
-float height={1.6,2,1.9,1.88,1.7,1.85,1.6,1.7,2.2,2.1,1.8,1.95,1.9,1.8,1.75};
-char output={"s","t","m","m","s","m","s","s","t","t","m","m","m","m","m"};
+char name[15]={"Kristina","Jim","Maggie","Martha","Stephanie","Bob","Kathy","Dave","Worth","Steven","Debbie","Todd", "Kim","Amy","Wynette"};
+char gender[15]={"f","m","f","f","f","m","f","m","m","m","f","m","f","f","f"};
+float height[15]={1.6,2,1.9,1.88,1.7,1.85,1.6,1.7,2.2,2.1,1.8,1.95,1.9,1.8,1.75};
+char output[15]={"s","t","m","m","s","m","s","s","t","t","m","m","m","m","m"};
+char genderValues[2]={"m","f"};
+char heightValues[6]={"1","2","3","4","5","6"};
+char heightRange[15];
 
 char heightDiscretiser(float height){
 
@@ -47,10 +50,11 @@ void valueAssigner(){
     attribute[i].height=height[i];
     attribute[i].output=output[i];
     attribute[i].heightRange=heightDiscretiser(height[i]);
+    heightRange[i]=heightDiscretiser(height[i]);
   }
 }
 
-unsigned int Log2n(unsigned float n)
+unsigned int Log2n(float n)
 {
     return (n > 1) ? 1 + Log2n(n / 2) : 0;
 }
@@ -68,7 +72,7 @@ int baseCounter(char match, char array[]){
 
   for (int i = 0; i < n; i++) {
     if (match==array[i]) {
-      count++:
+      count++;
     }
   }
 
@@ -81,7 +85,7 @@ int counter(char match, char array[], char condition){
 
   for (int i = 0; i < n; i++) {
     if ((match==array[i])&&(condition==output[i])) {
-      count++:
+      count++;
     }
   }
 
@@ -106,26 +110,23 @@ float attributeEntropyCalculator(char attribute, char array[]){
 
   //make more modular
 
-  int denominator=baseCounter(attribute,array);//denominator
-  int numeratorShort=counter(attribute,array,"s");//numerator
-  int numeratorMedium=counter(attribute,array,"m");//numerator
-  int denominatorTall=counter(attribute,array,"t");//numerator
+  int denominator=baseCounter(attribute,array);
+  int numeratorShort=counter(attribute,array,"s");
+  int numeratorMedium=counter(attribute,array,"m");
+  int numeratorTall=counter(attribute,array,"t");
 
-  // int males=baseCounter("m",gender);//denominator
-  // int females=baseCounter("f",gender);//denominator
-  //
-  // int malesShort=counter("m",gender,"s");//numerator
-  // int malesMedium=counter("m",gender,"m");//numerator
-  // int malesTall=counter("m",gender,"t");//numerator
-
-  float entropy=probabilityLog(numeratorShort,denominator)+probabilityLog(denominatorMedium,denominator)+probabilityLog(denominatorTall,denominator);
+  float entropy=probabilityLog(numeratorShort,denominator)+probabilityLog(numeratorMedium,denominator)+probabilityLog(numeratorTall,denominator);
 
   return entropy;
 }
 
-float weightedSumCalculator(char array[], char values[]){ //create values for each array, genderValues etc
+float weightedSumCalculator(char array[], char values[], int  n){
 
-  float value=attributeEntropyCalculator("m",gender)+attributeEntropyCalculator("f",gender);
+  float value;
+
+  for (int i = 0; i < n; i++) {
+    value+=attributeEntropyCalculator(values[i], array);
+  }
 
   return value;
 }
@@ -139,50 +140,22 @@ float InfoGainCalculator(float classEntropy, float weightedSum){
 
 int main() {
 
-  float weightedSum=weightedSumCalculator();
+  valueAssigner();
+
+  float weightedSumGender=weightedSumCalculator(gender,genderValues,2);
+  float weightedSumHeight=weightedSumCalculator(height,heightValues,7);
+
   float classEntropy=baseEntropy();
 
-  float InfoGain=InfoGainCalculator(classEntropy, weightedSum); //maybe create a struct for this
+  float InfoGainGender=InfoGainCalculator(classEntropy, weightedSumGender); //maybe create a struct for this
+  float InfoGainHeight=InfoGainCalculator(classEntropy, weightedSumHeight);
 
-
-  int k, acid_durability, strength;
-
-  printf("Enter value of k: ");
-  scanf("%d",&k);
-
-  fflush(stdin);
-
-  // printf("Working??");
-
-  //CRIES IN CODE
-
-  printf("\nEnter acid durability of tissue: ");
-  scanf("%d",&acid_durability);
-
-  fflush(stdin);
-
-  printf("\nEnter strength of tissue: ");
-  scanf("%d",&strength);
-
-  fflush(stdin);
-
-
-//Distance Caclulation
-  for (int i = 0; i < 8; i++) {
-    distanceArray[i]=euclideanDistance(acid_durability, strength, i);
-    tissueArray[i].acidTissue=acidArray[i];
-    tissueArray[i].strengthTissue=strengthArray[i];
-    tissueArray[i].classTissue=class[i];
-    tissueArray[i].distanceTissue=distanceArray[i];
+  if (InfoGainGender>+InfoGainHeight) {
+    printf("The first splitting attribute is Gender\n");
   }
-
-//Sorting
-
-  distanceSort();
-
-//Classifying
-
-  classifier(k);
+  else {
+    printf("The first splitting attribute is Height\n");
+  }
 
   return 0;
 }
