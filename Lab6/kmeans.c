@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+/*
+We take 2 means
+find distance with respect to each mean
+assign Clusters
+find mean from new clusters 
+*/
 
 float subjectA[7]={1.0,1.5,3.0,5.0,3.5,4.5,3.5};
 float subjectB[7]={1.0,2.0,4.0,7.0,5.0,5.0,4.5};
@@ -41,6 +47,15 @@ int indexC1=-1, indexC2=-1;
 //   return distance;
 // }
 
+/*
+
+Mean -> 1 -> 1.0, 1.0
+MEan 2 -> 3.5, 4.583
+
+
+
+*/
+
 float manhattanDistance(float x1, float y1, float mean[]){
 
   float x2=mean[0];
@@ -50,15 +65,16 @@ float manhattanDistance(float x1, float y1, float mean[]){
 }
 
 float clusterClassifier(float distanceMean1, float distanceMean2){
+  printf("Dist 1: %f, dist 2:%f\n",distanceMean1, distanceMean2 );
 
   if (distanceMean1<distanceMean2) {
     //cluster1[indexC1]=subjectScores[];//distanceMean1;
-    indexC1++;
+    ++indexC1;
     return 1;
   }
   else {
     //cluster2[indexC2]=subjectScores[];//distanceMean1;
-    indexC2++;
+    ++indexC2;
     return 2;
   }
 
@@ -67,7 +83,7 @@ float clusterClassifier(float distanceMean1, float distanceMean2){
 
 int distanceTable(float mean1[], float mean2[]){
 
-  printf("The distance Table: \n");
+  printf("\nThe distance Table: \n");
 
   for (int i = 0; i < 7; i++) {
     distancesMean1[i]=manhattanDistance(subjectScores[i][0],subjectScores[i][1],mean1);
@@ -88,7 +104,7 @@ int distanceTable(float mean1[], float mean2[]){
   for (int i = 0; i < indexC1; i++) {
     printf("%f\t",cluster1[i]);
   }
-  printf("cluster2\n");
+  printf("\ncluster2\n");
   for (int i = 0; i < indexC2; i++) {
     printf("%f\t",cluster2[i]);
   }
@@ -97,13 +113,15 @@ int distanceTable(float mean1[], float mean2[]){
   return -1;
 }
 
-float meanCalculator(float cluster[], int count){
+float meanCalculator1(float cluster[], int count){
 
   float sum1=0.0;
   float sum2=0.0;
 
+  printf("COUNT VAL IN MEANCALC 1: %d\n",count );
+
   for (int j = 0; j < 7; j++) {
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i <= count; i++) {
       if (subjectScores[j][2]==cluster[i]) {
         sum1+=subjectScores[i][0];
         sum2+=subjectScores[i][1];
@@ -111,8 +129,32 @@ float meanCalculator(float cluster[], int count){
     }
   }
 
-  mean1[0]=sum1/count;
-  mean1[1]=sum2/count;
+  mean1[0]=sum1/(float)count;
+  printf("Mean1 0: %f\t",mean1[0]);
+  mean1[1]=sum2/(float)count;
+  printf("Mean 1 1: %f\t",mean1[1]);
+
+  return 0.0;
+}
+
+float meanCalculator2(float cluster[], int count){
+
+  float sum1=0.0;
+  float sum2=0.0;
+
+  for (int j = 0; j < 7; j++) {
+    for (int i = 0; i <= count; i++) {
+      if (subjectScores[j][2]==cluster[i]) {
+        sum1+=subjectScores[i][0];
+        sum2+=subjectScores[i][1];
+      }
+    }
+  }
+
+  mean2[0]=sum1/(float)count;
+  printf("Mean 2 0: %f\t",mean2[0]);
+  mean2[1]=sum2/(float)count;
+  printf("Mean 2 1: %f\t",mean2[1]);
 
   return 0.0;
 }
@@ -152,8 +194,8 @@ oldMean1[1]=mean1[1])&&(oldMean2[0]=mean2[0])&&(oldMean2[1]=mean2[1])) {
   oldMean2[0]=mean2[0];
   oldMean2[1]=mean2[1];
   // oldMean2=mean2;
-  meanCalculator(cluster1,indexC1);
-  meanCalculator(cluster2,indexC2);
+  meanCalculator1(cluster1,indexC1);
+  meanCalculator2(cluster2,indexC2);
   indexC1=-1;
   indexC2=-1;
 
